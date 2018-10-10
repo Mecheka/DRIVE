@@ -1,20 +1,23 @@
-package com.drive;
+package com.drive.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class SettingActivity extends AppCompatActivity implements View.OnClickListener {
+import com.drive.R;
+import com.drive.manager.URLManager;
+
+public class SettingActicity extends AppCompatActivity implements View.OnClickListener {
 
     //SharedPreferences file
-    private static final String SPF_URL = "vidsurl";
-    private static final String URL = "url";
+    public static final String SPF_URL = "vidsurl";
+    public static final String URL = "url";
 
     private EditText editUrl;
     private Button btnSave;
@@ -26,6 +29,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_setting);
 
         initInstance();
+
     }
 
     private void initInstance() {
@@ -57,7 +61,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void saveUrl() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingActicity.this);
         builder.setMessage("Are you sure?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -73,6 +77,8 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
                         SharedPreferences urlPreferences = getSharedPreferences(SPF_URL, Context.MODE_PRIVATE);
                         urlPreferences.edit().putString(URL, url).apply();
+                        URLManager.getInInstace().setUrl(url);
+                        setResult(RESULT_OK);
                         finish();
                     }
                 })
@@ -86,5 +92,4 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
 }

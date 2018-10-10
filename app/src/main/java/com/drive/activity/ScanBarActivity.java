@@ -1,11 +1,14 @@
-package com.drive;
+package com.drive.activity;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,15 +18,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
+import com.drive.R;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.zxing.Result;
 
 import java.io.IOException;
-
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class ScanBarActivity extends AppCompatActivity {
 
@@ -96,6 +97,13 @@ public class ScanBarActivity extends AppCompatActivity {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodeArray = detections.getDetectedItems();
                 if (barcodeArray.size() != 0) {
+                    Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(500,VibrationEffect.DEFAULT_AMPLITUDE));
+                    }else{
+                        //deprecated in API 26
+                        vibrator.vibrate(500);
+                    }
                     tvScan.post(new Runnable() {
                         @Override
                         public void run() {
@@ -118,10 +126,10 @@ public class ScanBarActivity extends AppCompatActivity {
             case REQEUST_CAMERA: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermission()) {
+                        requestPermission();
                         return;
                     }
                     try {
-
                         cameraSource.start(cameraView.getHolder());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -139,7 +147,7 @@ public class ScanBarActivity extends AppCompatActivity {
     }
 
     private boolean checkPermission() {
-        return (ContextCompat.checkSelfPermission(ScanBarActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+        return (ContextCompat.checkSelfPermission(ScanBarActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED);
     }
 
     private void requestPermission() {

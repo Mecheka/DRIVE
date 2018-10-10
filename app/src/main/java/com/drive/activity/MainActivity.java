@@ -1,16 +1,19 @@
-package com.drive;
+package com.drive.activity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.drive.R;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -19,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //REQUEST CODE
     private static final int REQUEST_SCANBARCODE = 701;
+    private static final int REQUEST_SETTING = 702;
 
     //SharedPreferences file
     private static final String SPF_URL = "vidsurl";
@@ -36,14 +40,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         initInstance();
-        if (firtTime) {
 
-            firtTime = false;
+        SharedPreferences urlSPF = getSharedPreferences(SettingActicity.SPF_URL, Context.MODE_PRIVATE);
+        url = urlSPF.getString(SettingActicity.URL, "");
+        if (url.isEmpty()) {
+
+            Intent settingIntent = new Intent(MainActivity.this, SettingActicity.class);
+            startActivityForResult(settingIntent, REQUEST_SETTING);
+        }else {
             Intent scanIntent = new Intent(MainActivity.this, ScanBarActivity.class);
             startActivityForResult(scanIntent, REQUEST_SCANBARCODE);
-
         }
-
     }
 
     private void initInstance() {
@@ -76,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 break;
+            case REQUEST_SETTING:
+                if (resultCode == RESULT_OK) {
+                    Intent scanIntent = new Intent(this, ScanBarActivity.class);
+                    startActivityForResult(scanIntent, REQUEST_SCANBARCODE);
+                }
+                break;
         }
     }
 
@@ -87,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(scanIntent, REQUEST_SCANBARCODE);
                 break;
             case R.id.btnSetting:
-                Intent settingIntent = new Intent(MainActivity.this, SettingActivity.class);
+                Intent settingIntent = new Intent(MainActivity.this, SettingActicity.class);
                 startActivity(settingIntent);
                 break;
         }
